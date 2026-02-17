@@ -31,11 +31,11 @@ const defaultProducts = Array(12).fill(null).map((_, i) => ({
   id: i + 200,
   image: fallbackImages[i % fallbackImages.length],
   name: 'Achungha Mini Backpack',
-  category: ['Juice', 'Fruits',][i % 4],
+  category: ['Fruits', 'Fruits','Veges','Veges',][i % 4],
   price: '$150',
 }));
 
-const CATEGORIES = ['All',  'Juice', 'Fruits', 'Other'];
+const CATEGORIES = ['All',  'Fruits', 'Fruits','Veges', 'Veges',];
 
 const Products = () => {
   const { addToCart } = useCart();
