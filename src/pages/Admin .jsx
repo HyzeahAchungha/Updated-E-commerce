@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 // Simple password protection — change this to your own password
 const ADMIN_PASSWORD = 'achungha2025';
 
-const CATEGORIES = ['Bags', 'Shoes', 'Accessories', 'Clothing', 'Juice', 'Fruits', 'Other'];
+const CATEGORIES = [ 'Juice', 'Fruits', 'Other'];
 
 const emptyForm = {
   name: '', price: '', category: '', description: '', image: null, imagePreview: '',

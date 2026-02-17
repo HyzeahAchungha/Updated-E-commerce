@@ -31,11 +31,11 @@ const defaultProducts = Array(12).fill(null).map((_, i) => ({
   id: i + 200,
   image: fallbackImages[i % fallbackImages.length],
   name: 'Achungha Mini Backpack',
-  category: ['Bags', 'Shoes', 'Accessories', 'Clothing'][i % 4],
+  category: ['Juice', 'Fruits',][i % 4],
   price: '$150',
 }));
 
-const CATEGORIES = ['All', 'Bags', 'Shoes', 'Accessories', 'Clothing', 'Juice', 'Fruits', 'Other'];
+const CATEGORIES = ['All',  'Juice', 'Fruits', 'Other'];
 
 const Products = () => {
   const { addToCart } = useCart();
@@ -79,13 +79,13 @@ const Products = () => {
     <section className="section products" style={{ paddingTop: '80px' }}>
       <div className="container">
 
-        {/* ── Page Title ────────────────────────────────────────────────────── */}
+       
         <div style={{ marginBottom: '32px' }}>
           <h1 style={{ fontSize: '32px', fontWeight: '700', marginBottom: '8px' }}>Our Products</h1>
           <p style={{ color: '#888' }}>{filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found</p>
         </div>
 
-        {/* ── Filter / Sort Bar ──────────────────────────────────────────────── */}
+
         <div style={{
           display: 'flex', flexWrap: 'wrap', gap: '12px',
           alignItems: 'center', marginBottom: '28px',
@@ -147,7 +147,7 @@ const Products = () => {
           </button>
         </div>
 
-        {/* ── Product Grid ──────────────────────────────────────────────────── */}
+       
         {filteredProducts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 20px', color: '#888' }}>
             <div style={{ fontSize: '56px', marginBottom: '16px' }}>🔍</div>
