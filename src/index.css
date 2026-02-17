@@ -1,0 +1,321 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base Styles - Matching Original CSS */
+:root {
+  font-size: 62.5%; /* 1rem = 10px for easy rem calculation */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.6rem;
+  background-color: #fff;
+  color: #222;
+  font-weight: 400;
+}
+
+/* Hero Slider Animations */
+@keyframes movebottom {
+  0% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+
+@keyframes movetop {
+  0% {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+
+@keyframes moveleft {
+  0% {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+}
+
+.animate-movebottom {
+  animation: movebottom 1s ease-in-out;
+}
+
+.animate-movetop {
+  animation: movetop 1s ease-in-out;
+}
+
+.animate-moveleft {
+  animation: moveleft 1s ease-in-out;
+}
+
+/* Custom Utility Classes */
+.fix-nav {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Product Hover Effects */
+.product:hover .add-to-cart-btn {
+  border-radius: 1rem 0 0 0;
+}
+
+.product:hover .side-icons {
+  transform: translate(0%, -50%);
+}
+
+/* Collection Item Overlay */
+.collection-item::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 500ms ease-in-out;
+}
+
+.collection-item:hover::after {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Advert Item Overlay */
+.advert-item::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: all 300ms ease-in-out;
+}
+
+.advert-item:hover::after {
+  background-color: rgba(74, 223, 82, 0.4);
+}
+
+/* Swiper Custom Styles */
+.swiper-slide {
+  height: auto;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #69ae14;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #558b0f;
+}
+
+/* Loading Spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Transition Utilities */
+.transition-all {
+  transition: all 300ms ease-in-out;
+}
+
+.transition-transform {
+  transition: transform 500ms ease-in-out;
+}
+
+/* Image Object Fit */
+.object-cover {
+  object-fit: cover;
+}
+
+.object-contain {
+  object-fit: contain;
+}
+
+/* Admin Panel Styles */
+.admin-sidebar {
+  transition: transform 300ms ease-in-out;
+}
+
+.admin-sidebar.closed {
+  transform: translateX(-100%);
+}
+
+/* Checkout Sidebar */
+.checkout-sidebar {
+  transition: transform 300ms ease-in-out;
+}
+
+.checkout-sidebar.open {
+  transform: translateX(0);
+}
+
+.checkout-sidebar.closed {
+  transform: translateX(100%);
+}
+
+/* Toast Notifications Override */
+.toast-container {
+  z-index: 9999;
+}
+
+/* Mobile Menu Animation */
+.mobile-menu {
+  transition: left 300ms linear;
+}
+
+.mobile-menu.show {
+  left: 0;
+}
+
+/* Mega Menu */
+.mega-box {
+  opacity: 0;
+  visibility: hidden;
+  transition: all 300ms ease;
+}
+
+.nav-item:hover .mega-box {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Dropdown Menus */
+.dropdown-menu {
+  opacity: 0;
+  visibility: hidden;
+  transition: all 300ms ease;
+}
+
+.nav-item:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Form Input Focus */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #69ae14;
+  outline-offset: 2px;
+}
+
+/* Button Disabled State */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Card Shadows */
+.card-shadow {
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+}
+
+.card-shadow-lg {
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+}
+
+/* Custom Grid for Products */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+  gap: 3rem;
+}
+
+/* Responsive Container */
+.container-custom {
+  max-width: 114rem;
+  margin: 0 auto;
+  padding: 0 1.6rem;
+}
+
+@media (max-width: 1200px) {
+  .container-custom {
+    padding: 0 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .container-custom {
+    max-width: 60rem;
+  }
+}
+
+/* Custom Checkbox */
+input[type="checkbox"] {
+  cursor: pointer;
+  width: 1.6rem;
+  height: 1.6rem;
+  accent-color: #69ae14;
+}
+
+/* Pagination Active State */
+.pagination-item.active {
+  background-color: #69ae14;
+  color: white;
+  border-color: #69ae14;
+}
+
+/* Image Gallery */
+.thumbnail-active {
+  border: 2px solid #69ae14;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.75);
+  z-index: 9998;
+}
+
+/* Skeleton Loading */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeleton {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background-color: #e5e7eb;
+}

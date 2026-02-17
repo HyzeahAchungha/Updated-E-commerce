@@ -1,0 +1,243 @@
+[
+  {
+    "id": "prod_1",
+    "name": "Achungha Mini Fruit Basket",
+    "price": 150,
+    "category": "Fruits",
+    "description": "Fresh mini fruit basket with a variety of seasonal fruits. Perfect for a healthy snack or gift.",
+    "image": "/images/product-1.jpg",
+    "images": [
+      "/images/product-1.jpg",
+      "/images/product-2.jpg",
+      "/images/product-3.jpg",
+      "/images/product-4.jpg"
+    ],
+    "brand": "Achungha Fresh",
+    "inStock": true,
+    "featured": true,
+    "quantity": 50,
+    "tags": ["fruits", "fresh", "organic"]
+  },
+  {
+    "id": "prod_2",
+    "name": "Organic Orange Pack",
+    "price": 150,
+    "category": "Fruits",
+    "description": "Premium organic oranges sourced from local farms. Rich in vitamin C and perfect for juicing.",
+    "image": "/images/product-2.jpg",
+    "images": [
+      "/images/product-2.jpg",
+      "/images/product-1.jpg",
+      "/images/product-3.jpg"
+    ],
+    "brand": "Achungha Fresh",
+    "inStock": true,
+    "featured": true,
+    "quantity": 75,
+    "tags": ["fruits", "organic", "citrus"]
+  },
+  {
+    "id": "prod_3",
+    "name": "Fresh Mango Selection",
+    "price": 150,
+    "category": "Fruits",
+    "description": "Sweet and juicy mangoes handpicked for perfect ripeness. Great for smoothies and desserts.",
+    "image": "/images/product-3.jpg",
+    "images": [
+      "/images/product-3.jpg",
+      "/images/product-1.jpg"
+    ],
+    "brand": "Achungha Fresh",
+    "inStock": true,
+    "featured": true,
+    "quantity": 60,
+    "tags": ["fruits", "tropical", "sweet"]
+  },
+  {
+    "id": "prod_4",
+    "name": "Premium Grape Bunch",
+    "price": 150,
+    "category": "Fruits",
+    "description": "Seedless grapes bursting with flavor. Perfect for snacking or adding to fruit salads.",
+    "image": "/images/product-4.jpg",
+    "images": [
+      "/images/product-4.jpg",
+      "/images/product-5.jpg"
+    ],
+    "brand": "Achungha Fresh",
+    "inStock": true,
+    "featured": true,
+    "quantity": 45,
+    "tags": ["fruits", "grapes", "seedless"]
+  },
+  {
+    "id": "prod_5",
+    "name": "Fresh Pineapple",
+    "price": 150,
+    "category": "Fruits",
+    "description": "Tropical pineapple with sweet and tangy flavor. Excellent source of nutrients and enzymes.",
+    "image": "/images/product-5.jpg",
+    "images": [
+      "/images/product-5.jpg",
+      "/images/product-6.jpg"
+    ],
+    "brand": "Achungha Fresh",
+    "inStock": true,
+    "featured": true,
+    "quantity": 40,
+    "tags": ["fruits", "tropical", "pineapple"]
+  },
+  {
+    "id": "prod_6",
+    "name": "Garden Vegetables Mix",
+    "price": 150,
+    "category": "Vegetables",
+    "description": "Fresh mixed vegetables from local gardens. Perfect for healthy cooking and salads.",
+    "image": "/images/product-6.jpg",
+    "images": [
+      "/images/product-6.jpg",
+      "/images/product-7.jpg"
+    ],
+    "brand": "Achungha Fresh",
+    "inStock": true,
+    "featured": true,
+    "quantity": 55,
+    "tags": ["vegetables", "fresh", "organic"]
+  },
+  {
+    "id": "prod_7",
+    "name": "Organic Tomatoes",
+    "price": 150,
+    "category": "Vegetables",
+    "description": "Vine-ripened organic tomatoes bursting with flavor. Essential for cooking and salads.",
+    "image": "/images/product-7.jpg",
+    "images": [
+      "/images/product-7.jpg",
+      "/images/product-8.jpg"
+    ],
+    "brand": "Achungha Fresh",
+    "inStock": true,
+    "featured": false,
+    "quantity": 80,
+    "tags": ["vegetables", "tomatoes", "organic"]
+  },
+  {
+    "id": "prod_8",
+    "name": "Fresh Potato Bag",
+    "price": 150,
+    "category": "Vegetables",
+    "description": "High-quality potatoes perfect for any cooking method. Versatile and nutritious.",
+    "image": "/images/product-8.jpg",
+    "images": [
+      "/images/product-8.jpg",
+      "/images/product-9.jpg"
+    ],
+    "brand": "Achungha Fresh",
+    "inStock": true,
+    "featured": false,
+    "quantity": 100,
+    "tags": ["vegetables", "potatoes", "staple"]
+  },
+  {
+    "id": "prod_9",
+    "name": "Green Leaf Lettuce",
+    "price": 150,
+    "category": "Vegetables",
+    "description": "Crisp and fresh lettuce perfect for salads and sandwiches. Grown without pesticides.",
+    "image": "/images/product-9.jpg",
+    "images": [
+      "/images/product-9.jpg",
+      "/images/product-10.jpg"
+    ],
+    "brand": "Achungha Fresh",
+    "inStock": true,
+    "featured": false,
+    "quantity": 35,
+    "tags": ["vegetables", "lettuce", "greens"]
+  },
+  {
+    "id": "prod_10",
+    "name": "Mixed Berry Box",
+    "price": 150,
+    "category": "Fruits",
+    "description": "Assorted fresh berries including strawberries and blueberries. Packed with antioxidants.",
+    "image": "/images/product-10.jpg",
+    "images": [
+      "/images/product-10.jpg",
+      "/images/product-11.jpg"
+    ],
+    "brand": "Achungha Fresh",
+    "inStock": true,
+    "featured": false,
+    "quantity": 30,
+    "tags": ["fruits", "berries", "antioxidants"]
+  },
+  {
+    "id": "prod_11",
+    "name": "Organic Carrot Bundle",
+    "price": 150,
+    "category": "Vegetables",
+    "description": "Sweet and crunchy organic carrots. Great for snacking, cooking, or juicing.",
+    "image": "/images/product-11.jpg",
+    "images": [
+      "/images/product-11.jpg",
+      "/images/product-12.jpg"
+    ],
+    "brand": "Achungha Fresh",
+    "inStock": true,
+    "featured": false,
+    "quantity": 65,
+    "tags": ["vegetables", "carrots", "organic"]
+  },
+  {
+    "id": "prod_12",
+    "name": "Fresh Spinach Pack",
+    "price": 150,
+    "category": "Vegetables",
+    "description": "Nutrient-rich fresh spinach. Perfect for salads, smoothies, and cooking.",
+    "image": "/images/product-12.jpg",
+    "images": [
+      "/images/product-12.jpg",
+      "/images/product-13.jpg"
+    ],
+    "brand": "Achungha Fresh",
+    "inStock": true,
+    "featured": false,
+    "quantity": 40,
+    "tags": ["vegetables", "spinach", "greens"]
+  },
+  {
+    "id": "prod_13",
+    "name": "Bell Pepper Mix",
+    "price": 150,
+    "category": "Vegetables",
+    "description": "Colorful mix of red, yellow, and green bell peppers. Sweet and crunchy.",
+    "image": "/images/product-13.jpg",
+    "images": [
+      "/images/product-13.jpg",
+      "/images/product-14.jpg"
+    ],
+    "brand": "Achungha Fresh",
+    "inStock": true,
+    "featured": false,
+    "quantity": 50,
+    "tags": ["vegetables", "peppers", "colorful"]
+  },
+  {
+    "id": "prod_14",
+    "name": "Fresh Cucumber Pack",
+    "price": 150,
+    "category": "Vegetables",
+    "description": "Crisp and refreshing cucumbers. Perfect for salads and healthy snacking.",
+    "image": "/images/product-14.jpg",
+    "images": [
+      "/images/product-14.jpg",
+      "/images/product-1.jpg"
+    ],
+    "brand": "Achungha Fresh",
+    "inStock": true,
+    "featured": false,
+    "quantity": 55,
+    "tags": ["vegetables", "cucumber", "fresh"]
+  }
+]
