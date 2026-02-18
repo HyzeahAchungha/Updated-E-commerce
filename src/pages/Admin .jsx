@@ -1,52 +1,138 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-// Simple password protection — change this to your own password
-const ADMIN_PASSWORD = 'achungha2025';
+const CATEGORIES = ['Juice', 'Fruits', 'Other'];
 
-const CATEGORIES = [ 'Juice', 'Fruits', 'Other'];
+// Simple hash function (for frontend storage - in production use backend!)
+const simpleHash = (str) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return hash.toString(36);
+};
 
 const emptyForm = {
   name: '', price: '', category: '', description: '', image: null, imagePreview: '',
 };
 
 const AdminPage = () => {
-  const [authed, setAuthed]       = useState(() => sessionStorage.getItem('achungha_admin') === 'yes');
-  const [password, setPassword]   = useState('');
-  const [pwError, setPwError]     = useState('');
+  const navigate = useNavigate();
 
-  const [products, setProducts]   = useState(() => {
+  // Check if admin account exists
+  const [adminExists, setAdminExists] = useState(() => {
+    return !!localStorage.getItem('achungha_admin_account');
+  });
+
+  // Check if currently logged in
+  const [authed, setAuthed] = useState(() => {
+    return sessionStorage.getItem('achungha_admin_session') === 'active';
+  });
+
+  const [authMode, setAuthMode] = useState('login'); 
+  const [authForm, setAuthForm] = useState({ email: '', password: '', confirmPassword: '' });
+  const [authError, setAuthError] = useState('');
+
+
+  const [products, setProducts] = useState(() => {
     const saved = localStorage.getItem('achungha_products');
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [form, setForm]           = useState(emptyForm);
-  const [editId, setEditId]       = useState(null);
-  const [saved, setSaved]         = useState(false);
-  const [tab, setTab]             = useState('add'); // 'add' | 'list'
-  const fileRef                   = useRef();
+  const [form, setForm] = useState(emptyForm);
+  const [editId, setEditId] = useState(null);
+  const [saved, setSaved] = useState(false);
+  const [tab, setTab] = useState('add');
+  const [hideDefaults, setHideDefaults] = useState(() => 
+    localStorage.getItem('achungha_hide_defaults') === 'true'
+  );
+  const fileRef = useRef();
 
-  // Persist products to localStorage
   useEffect(() => {
     localStorage.setItem('achungha_products', JSON.stringify(products));
   }, [products]);
 
+
+  const handleSignup = (e) => {
+    e.preventDefault();
+    setAuthError('');
+
+    if (!authForm.email || !authForm.password || !authForm.confirmPassword) {
+      setAuthError('All fields are required');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(authForm.email)) {
+      setAuthError('Please enter a valid email');
+      return;
+    }
+    if (authForm.password.length < 6) {
+      setAuthError('Password must be at least 6 characters');
+      return;
+    }
+    if (authForm.password !== authForm.confirmPassword) {
+      setAuthError('Passwords do not match');
+      return;
+    }
+
+
+    const adminAccount = {
+      email: authForm.email.toLowerCase(),
+      passwordHash: simpleHash(authForm.password),
+      createdAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem('achungha_admin_account', JSON.stringify(adminAccount));
+    sessionStorage.setItem('achungha_admin_session', 'active');
+    sessionStorage.setItem('achungha_admin_email', authForm.email);
+
+    setAdminExists(true);
+    setAuthed(true);
+    setAuthForm({ email: '', password: '', confirmPassword: '' });
+  };
+
+  // ── LOGIN
   const handleLogin = (e) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      sessionStorage.setItem('achungha_admin', 'yes');
+    setAuthError('');
+
+    if (!authForm.email || !authForm.password) {
+      setAuthError('Email and password are required');
+      return;
+    }
+
+    const stored = localStorage.getItem('achungha_admin_account');
+    if (!stored) {
+      setAuthError('No admin account found');
+      return;
+    }
+
+    const adminAccount = JSON.parse(stored);
+    const inputHash = simpleHash(authForm.password);
+
+    if (
+      authForm.email.toLowerCase() === adminAccount.email &&
+      inputHash === adminAccount.passwordHash
+    ) {
+      sessionStorage.setItem('achungha_admin_session', 'active');
+      sessionStorage.setItem('achungha_admin_email', authForm.email);
       setAuthed(true);
+      setAuthForm({ email: '', password: '', confirmPassword: '' });
     } else {
-      setPwError('Incorrect password');
+      setAuthError('Invalid email or password');
     }
   };
 
+  // ── LOGOUT 
   const handleLogout = () => {
-    sessionStorage.removeItem('achungha_admin');
+    sessionStorage.removeItem('achungha_admin_session');
+    sessionStorage.removeItem('achungha_admin_email');
     setAuthed(false);
+    navigate('/');
   };
 
-  // ── Form handlers ──────────────────────────────────────────────────────────
+
   const set = (key, val) => setForm(p => ({ ...p, [key]: val }));
 
   const handleImageChange = (e) => {
@@ -67,7 +153,6 @@ const AdminPage = () => {
     }
 
     if (editId !== null) {
-      // Update existing
       setProducts(prev => prev.map(p =>
         p.id === editId
           ? { ...p, name: form.name, price: form.price, category: form.category, description: form.description, image: form.image || p.image }
@@ -75,7 +160,6 @@ const AdminPage = () => {
       ));
       setEditId(null);
     } else {
-      // Add new
       const newProduct = {
         id: Date.now(),
         name: form.name,
@@ -117,49 +201,111 @@ const AdminPage = () => {
     setEditId(null);
   };
 
-  // ── Login screen ───────────────────────────────────────────────────────────
-  if (!authed) {
+ 
+  if (!adminExists) {
     return (
       <div style={{
-        minHeight: '100vh', display: 'flex', alignItems: 'center',
-        justifyContent: 'center', background: '#f9f9f9',
+        minHeight: '90vh', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
       }}>
         <div style={{
           background: 'white', padding: '48px 40px', borderRadius: '20px',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.08)', width: '100%', maxWidth: '400px',
-          textAlign: 'center',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)', width: '100%', maxWidth: '440px',
         }}>
           <div style={{
-            width: '72px', height: '72px', background: '#e8f5e9',
+            width: '80px', height: '80px', background: 'linear-gradient(135deg, #69ae14 0%, #4a8a0a 100%)',
             borderRadius: '50%', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', margin: '0 auto 20px', fontSize: '32px',
-          }}>🔐</div>
-          <h2 style={{ fontSize: '26px', fontWeight: '700', marginBottom: '8px' }}>Admin Access</h2>
-          <p style={{ color: '#888', marginBottom: '28px' }}>Achungha Store Dashboard</p>
+            justifyContent: 'center', margin: '0 auto 24px', fontSize: '36px',
+          }}>🌿</div>
 
-          <form onSubmit={handleLogin}>
-            <input
-              type="password" value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="Enter admin password"
-              style={{
-                width: '100%', padding: '14px', border: '2px solid #e0e0e0',
-                borderRadius: '10px', fontSize: '16px', marginBottom: '12px',
-                outline: 'none', fontFamily: 'inherit',
-              }}
-            />
-            {pwError && (
-              <p style={{ color: '#cc0000', fontSize: '13px', marginBottom: '12px' }}>⚠️ {pwError}</p>
+          <h2 style={{ fontSize: '28px', fontWeight: '800', marginBottom: '8px', textAlign: 'center' }}>
+            Create Admin Account
+          </h2>
+          <p style={{ color: '#888', marginBottom: '32px', textAlign: 'center', fontSize: '14px' }}>
+            Set up your Achungha store admin account
+          </p>
+
+          <form onSubmit={handleSignup}>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '14px', color: '#333' }}>
+                Admin Email
+              </label>
+              <input
+                type="email"
+                value={authForm.email}
+                onChange={e => setAuthForm(p => ({ ...p, email: e.target.value }))}
+                placeholder="admin@achungha.com"
+                style={{
+                  width: '100%', padding: '12px 14px', border: '2px solid #e0e0e0',
+                  borderRadius: '10px', fontSize: '15px', outline: 'none', fontFamily: 'inherit',
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '14px', color: '#333' }}>
+                Password
+              </label>
+              <input
+                type="password"
+                value={authForm.password}
+                onChange={e => setAuthForm(p => ({ ...p, password: e.target.value }))}
+                placeholder="At least 6 characters"
+                style={{
+                  width: '100%', padding: '12px 14px', border: '2px solid #e0e0e0',
+                  borderRadius: '10px', fontSize: '15px', outline: 'none', fontFamily: 'inherit',
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '14px', color: '#333' }}>
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                value={authForm.confirmPassword}
+                onChange={e => setAuthForm(p => ({ ...p, confirmPassword: e.target.value }))}
+                placeholder="Re-enter password"
+                style={{
+                  width: '100%', padding: '12px 14px', border: '2px solid #e0e0e0',
+                  borderRadius: '10px', fontSize: '15px', outline: 'none', fontFamily: 'inherit',
+                }}
+              />
+            </div>
+
+            {authError && (
+              <div style={{
+                background: '#fff0f0', border: '1px solid #ffcccc',
+                borderRadius: '8px', padding: '12px', marginBottom: '16px',
+                color: '#cc0000', fontSize: '14px',
+              }}>
+                ⚠️ {authError}
+              </div>
             )}
+
             <button type="submit" style={{
-              width: '100%', padding: '14px', background: '#69ae14',
+              width: '100%', padding: '14px', background: 'linear-gradient(135deg, #69ae14 0%, #4a8a0a 100%)',
               color: 'white', border: 'none', borderRadius: '10px',
               fontSize: '16px', fontWeight: '700', cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(105,174,20,0.3)',
             }}>
-              Login
+              Create Admin Account
             </button>
           </form>
-          <Link to="/" style={{ display: 'block', marginTop: '20px', color: '#888', fontSize: '14px' }}>
+
+          <div style={{
+            marginTop: '24px', padding: '16px', background: '#e3f2fd',
+            borderRadius: '10px', fontSize: '13px', color: '#0d47a1', lineHeight: 1.6,
+          }}>
+            <strong>⚠️ Important:</strong> This is your only admin account. 
+            Save your credentials safely. If you lose them, you'll need to clear browser data to reset.
+          </div>
+
+          <Link to="/" style={{
+            display: 'block', marginTop: '20px', color: '#888',
+            fontSize: '14px', textAlign: 'center', textDecoration: 'none',
+          }}>
             ← Back to Store
           </Link>
         </div>
@@ -167,10 +313,88 @@ const AdminPage = () => {
     );
   }
 
-  // ── Admin dashboard ────────────────────────────────────────────────────────
+
+  if (!authed) {
+    return (
+      <div style={{
+        minHeight: '100vh', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      }}>
+        <div style={{
+          background: 'white', padding: '48px 40px', borderRadius: '20px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)', width: '100%', maxWidth: '400px',
+        }}>
+          <div style={{
+            width: '72px', height: '72px', background: 'linear-gradient(135deg, #69ae14 0%, #4a8a0a 100%)',
+            borderRadius: '50%', display: 'flex', alignItems: 'center',
+            justifyContent: 'center', margin: '0 auto 20px', fontSize: '32px',
+          }}>🔐</div>
+
+          <h2 style={{ fontSize: '26px', fontWeight: '700', marginBottom: '8px', textAlign: 'center' }}>
+            Admin Login
+          </h2>
+          <p style={{ color: '#888', marginBottom: '28px', textAlign: 'center' }}>
+            Achungha Store Dashboard
+          </p>
+
+          <form onSubmit={handleLogin}>
+            <div style={{ marginBottom: '14px' }}>
+              <input
+                type="email"
+                value={authForm.email}
+                onChange={e => setAuthForm(p => ({ ...p, email: e.target.value }))}
+                placeholder="Admin email"
+                style={{
+                  width: '100%', padding: '14px', border: '2px solid #e0e0e0',
+                  borderRadius: '10px', fontSize: '15px', outline: 'none', fontFamily: 'inherit',
+                }}
+              />
+            </div>
+
+            <div style={{ marginBottom: '12px' }}>
+              <input
+                type="password"
+                value={authForm.password}
+                onChange={e => setAuthForm(p => ({ ...p, password: e.target.value }))}
+                placeholder="Password"
+                style={{
+                  width: '100%', padding: '14px', border: '2px solid #e0e0e0',
+                  borderRadius: '10px', fontSize: '15px', outline: 'none', fontFamily: 'inherit',
+                }}
+              />
+            </div>
+
+            {authError && (
+              <p style={{ color: '#cc0000', fontSize: '13px', marginBottom: '12px' }}>
+                ⚠️ {authError}
+              </p>
+            )}
+
+            <button type="submit" style={{
+              width: '100%', padding: '14px', background: 'linear-gradient(135deg, #69ae14 0%, #4a8a0a 100%)',
+              color: 'white', border: 'none', borderRadius: '10px',
+              fontSize: '16px', fontWeight: '700', cursor: 'pointer',
+            }}>
+              Login to Dashboard
+            </button>
+          </form>
+
+          <Link to="/" style={{
+            display: 'block', marginTop: '20px', color: '#888',
+            fontSize: '14px', textAlign: 'center', textDecoration: 'none',
+          }}>
+            ← Back to Store
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+
+  const adminEmail = sessionStorage.getItem('achungha_admin_email');
+
   return (
     <div style={{ minHeight: '100vh', background: '#f9f9f9' }}>
-
       {/* Header */}
       <div style={{
         background: '#222', padding: '0 40px',
@@ -184,6 +408,7 @@ const AdminPage = () => {
           </span>
         </div>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <span style={{ color: '#aaa', fontSize: '13px' }}>{adminEmail}</span>
           <Link to="/products" style={{ color: '#aaa', fontSize: '14px', textDecoration: 'none' }}>
             View Store ↗
           </Link>
@@ -198,22 +423,42 @@ const AdminPage = () => {
 
       {/* Stats bar */}
       <div style={{ background: 'white', borderBottom: '1px solid #eee', padding: '16px 40px' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', gap: '32px' }}>
-          <div>
-            <span style={{ fontSize: '28px', fontWeight: '800', color: '#69ae14' }}>{products.length}</span>
-            <span style={{ color: '#888', fontSize: '14px', marginLeft: '6px' }}>Total Products</span>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', gap: '32px', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', gap: '32px' }}>
+            <div>
+              <span style={{ fontSize: '28px', fontWeight: '800', color: '#69ae14' }}>{products.length}</span>
+              <span style={{ color: '#888', fontSize: '14px', marginLeft: '6px' }}>Your Products</span>
+            </div>
+            <div>
+              <span style={{ fontSize: '28px', fontWeight: '800', color: '#69ae14' }}>
+                {[...new Set(products.map(p => p.category))].length}
+              </span>
+              <span style={{ color: '#888', fontSize: '14px', marginLeft: '6px' }}>Categories</span>
+            </div>
           </div>
-          <div>
-            <span style={{ fontSize: '28px', fontWeight: '800', color: '#69ae14' }}>
-              {[...new Set(products.map(p => p.category))].length}
-            </span>
-            <span style={{ color: '#888', fontSize: '14px', marginLeft: '6px' }}>Categories</span>
-          </div>
+
+          <button
+            onClick={() => {
+              const newValue = !hideDefaults;
+              localStorage.setItem('achungha_hide_defaults', newValue ? 'true' : 'false');
+              setHideDefaults(newValue);
+              alert(newValue 
+                ? '✅ Demo products hidden from store (refresh Products page to see changes)' 
+                : '✅ Demo products now visible in store (refresh Products page to see changes)');
+            }}
+            style={{
+              padding: '8px 16px', background: '#f0f0f0',
+              border: '1px solid #ddd', borderRadius: '8px',
+              fontSize: '13px', fontWeight: '600', cursor: 'pointer',
+              color: '#555',
+            }}
+          >
+            {hideDefaults ? '👁️ Show Demo Products' : '🚫 Hide Demo Products'}
+          </button>
         </div>
       </div>
 
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '32px 20px' }}>
-
         {/* Tabs */}
         <div style={{ display: 'flex', gap: '4px', marginBottom: '28px', background: '#e0e0e0', padding: '4px', borderRadius: '12px', width: 'fit-content' }}>
           {[{ key: 'add', label: editId ? '✏️ Edit Product' : '➕ Add Product' }, { key: 'list', label: `📦 Products (${products.length})` }].map(t => (
@@ -227,7 +472,6 @@ const AdminPage = () => {
           ))}
         </div>
 
-        {/* Success banner */}
         {saved && (
           <div style={{
             background: '#e8f5e9', border: '1px solid #a5d6a7',
@@ -238,12 +482,28 @@ const AdminPage = () => {
           </div>
         )}
 
-        {/* ── ADD / EDIT FORM ──────────────────────────────────────────────── */}
-        {tab === 'add' && (
+        {products.length === 0 && !hideDefaults && (
           <div style={{
-            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px',
+            background: '#e3f2fd', border: '1px solid #90caf9',
+            borderRadius: '10px', padding: '16px 20px', marginBottom: '20px',
+            display: 'flex', alignItems: 'flex-start', gap: '12px',
           }}>
-            {/* Form */}
+            <span style={{ fontSize: '20px' }}>💡</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontWeight: '600', color: '#0d47a1', marginBottom: '6px' }}>
+                About Demo Products
+              </p>
+              <p style={{ color: '#555', fontSize: '14px', lineHeight: 1.6 }}>
+                Your store currently shows 12 demo products. When you add your own products, they'll appear alongside the demos. 
+                Use the <strong>"Hide Demo Products"</strong> button above when you're ready to show only your real products.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ADD / EDIT FORM */}
+        {tab === 'add' && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
             <div style={{ background: 'white', borderRadius: '16px', padding: '28px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
               <h2 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '24px' }}>
                 {editId ? 'Edit Product' : 'Add New Product'}
@@ -281,7 +541,6 @@ const AdminPage = () => {
                   style={{ width: '100%', padding: '12px', border: '2px solid #e0e0e0', borderRadius: '8px', fontSize: '15px', outline: 'none', resize: 'vertical', fontFamily: 'inherit' }} />
               </div>
 
-              {/* Image upload */}
               <div style={{ marginBottom: '24px' }}>
                 <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', fontSize: '14px' }}>Product Image</label>
                 <div
@@ -372,7 +631,7 @@ const AdminPage = () => {
           </div>
         )}
 
-        {/* ── PRODUCT LIST ─────────────────────────────────────────────────── */}
+        {/* PRODUCT LIST */}
         {tab === 'list' && (
           <div>
             {products.length === 0 ? (

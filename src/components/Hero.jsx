@@ -61,7 +61,7 @@ const Hero = () => {
                   at Juice
                 </h1>
                 <p>Shop with Achungha! here we sell good and afordable fruit and groceries</p>
-                <a href="">Show Now</a>
+                <li><Link to="/products">Show Now</Link></li>
               </div>
             </div>
 
@@ -74,7 +74,7 @@ const Hero = () => {
                   <span>$9</span>
                 </h1>
                 <p>Shop with Achungha! here we sell good and afordable fruit and groceries</p>
-                <a href="">Show Now</a>
+                 <li><Link to="/products">Show Now</Link></li>
               </div>
             </div>
           </div>

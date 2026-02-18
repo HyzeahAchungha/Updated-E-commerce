@@ -20,46 +20,53 @@ import product13 from "../assets/images/product-13.jpg";
 import product14 from "../assets/images/product-14.jpg";
 
 
-
 const fallbackImages = [
   product1, product2, product3, product4, product5, product6, product7,
   product8, product9, product10, product11, product12, product13, product14,
 ];
 
-// Default demo products (shown if admin hasn't added any yet)
+
 const defaultProducts = Array(12).fill(null).map((_, i) => ({
   id: i + 200,
   image: fallbackImages[i % fallbackImages.length],
   name: 'Achungha Mini Backpack',
-  category: ['Fruits', 'Fruits','Veges','Veges',][i % 4],
+  category: ['Juice', 'Fruits', 'Other'][i % 4],
   price: '$150',
 }));
 
-const CATEGORIES = ['All',  'Fruits', 'Fruits','Veges', 'Veges',];
+const CATEGORIES = ['All',  'Juice', 'Fruits', 'Other'];
 
 const Products = () => {
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { openCart, openFilter, openQuickView } = useUI();
 
-  // Load products: admin-added products first, then fill with defaults if none
+  // Load products: admin products + default products (unless admin cleared defaults)
   const [adminProducts, setAdminProducts] = useState([]);
+  const [showDefaults, setShowDefaults] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');
   const [sortBy, setSortBy] = useState('default');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const saved = localStorage.getItem('achungha_products');
+    const hideDefaults = localStorage.getItem('achungha_hide_defaults') === 'true';
+    
     if (saved) {
       const parsed = JSON.parse(saved);
-      setAdminProducts(parsed.length > 0 ? parsed : defaultProducts);
-    } else {
-      setAdminProducts(defaultProducts);
+      setAdminProducts(parsed);
     }
+    setShowDefaults(!hideDefaults);
   }, []);
 
-  // Filtering + sorting
-  const filteredProducts = adminProducts
+
+  const allProducts = [
+    ...adminProducts,
+    ...(showDefaults ? defaultProducts : [])
+  ];
+
+ 
+  const filteredProducts = allProducts
     .filter(p => activeCategory === 'All' || p.category === activeCategory)
     .filter(p => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => {
@@ -79,13 +86,13 @@ const Products = () => {
     <section className="section products" style={{ paddingTop: '80px' }}>
       <div className="container">
 
-       
+        {/* ── Page Title ────────────────────────────────────────────────────── */}
         <div style={{ marginBottom: '32px' }}>
           <h1 style={{ fontSize: '32px', fontWeight: '700', marginBottom: '8px' }}>Our Products</h1>
           <p style={{ color: '#888' }}>{filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found</p>
         </div>
 
-
+        {/* ── Filter / Sort Bar ──────────────────────────────────────────────── */}
         <div style={{
           display: 'flex', flexWrap: 'wrap', gap: '12px',
           alignItems: 'center', marginBottom: '28px',
@@ -147,7 +154,7 @@ const Products = () => {
           </button>
         </div>
 
-       
+        {/* ── Product Grid ──────────────────────────────────────────────────── */}
         {filteredProducts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 20px', color: '#888' }}>
             <div style={{ fontSize: '56px', marginBottom: '16px' }}>🔍</div>
